@@ -61,28 +61,80 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
-# ... place you code here to LIST accounts ...
+# List all accounts
+
+def list_accounts():
+    """Returns all of the Accounts"""
+    app.logger.info("Request for account list")
+    accounts = []
+    category = request.args.get("category")
+    if category:
+        accounts = Account.find_by_category(category)
+    else:
+        accounts = Account.all()
+    results = [account.serialize() for account in accounts]
+    return make_response(jsonify(results), status.HTTP_200_OK)
+#uncomment once tests pass
 
 
 ######################################################################
 # READ AN ACCOUNT
 ######################################################################
 
-# ... place you code here to READ an account ...
+def read_account():
+    """
+    Read a single Account
+    This endpoint will return an Account based on it's id
+    """
+    app.logger.info("Request for account with id: %s", account_id)
+    account = Account.find(account_id)
+    if not account:
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id {account_id} was not found")
+    return make_response(jsonify(account.serialize()), status.HTTP_200_OK)
 
+#uncomment once tests pass
 
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
 
-# ... place you code here to UPDATE an account ...
+def update_account():
+    """
+    Update an existing Account
+    This endpoint will update an Account based the body that is posted
+    """
+    app.logger.info("Request to update account with id: %s", account_id)
+    check_content_type("application/json")
+    account = Account.find(account_id)
+    if not account:
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id {account_id} was not found")
+    account.deserialize(request.get_json())
+    account.id = account_id
+    account.save()
+    return make_response(jsonify(account.serialize()), status.HTTP_200_OK)
+
+#uncomment once tests pass
 
 
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
 
-# ... place you code here to DELETE an account ...
+def delete_account():
+    """
+    Delete a Account
+    This endpoint will delete an Account based the id specified in the path
+    """
+    app.logger.info("Request to delete account with id: %s", account_id)
+    account = Account.find(account_id)
+    if account:
+        account.delete()
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
+
+
+#uncomment once tests pass
+
 
 
 ######################################################################
